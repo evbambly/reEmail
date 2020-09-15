@@ -2,13 +2,15 @@ const functions = require("firebase-functions");
 const firebase = require("firebase-admin")
 const sgMail = require("@sendgrid/mail");
 firebase.initializeApp()
-sgMail.setApiKey(
-  "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"
-);
 const moment = require('moment')
 const corsModule = require("cors");
 const cors = corsModule({ origin: true })
 const Places = require("google-places-web").default;
+
+const SG_API_KEY = functions.config().sendgrid.key;
+const SG_TEMPLATE_ID = functions.config().sendgrid.key;
+const PLACES_API_KEY = functions.config().places.key;
+sgMail.setApiKey(SG_API_KEY);
 
 exports.emailMessage = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
@@ -153,20 +155,20 @@ async function sendEmail(email, departure_airport, destination_airport) {
   try {
     const results = await getRentals(destination_airport)
 
-      carRental = results[0]
-      const msg = {
-        to: email,
-        from: "evbambly@gmail.com",
-        templateId: "d-c98afedc15c84c17801b9d12adc2280c",
-        dynamic_template_data: {
-          departure_airport: departure_airport || undefined,
-          destination_airport: destination_airport || undefined,
-          rental_name: carRental.name || "",
-          vicinity: carRental.vicinity || "",
-          rating: carRental.rating || "",
-          open_now: carRental.opening_hours && carRental.opening_hours.open_now ? "They are open now" : ""
-        },
-      };
+    carRental = results[0]
+    const msg = {
+      to: email,
+      from: "evbambly@gmail.com",
+      templateId: SG_TEMPLATE_ID,
+      dynamic_template_data: {
+        departure_airport: departure_airport || undefined,
+        destination_airport: destination_airport || undefined,
+        rental_name: carRental.name || "",
+        vicinity: carRental.vicinity || "",
+        rating: carRental.rating || "",
+        open_now: carRental.opening_hours && carRental.opening_hours.open_now ? "They are open now" : ""
+      },
+    };
     firebase.firestore().collection("sentMail").doc(email).set({
       departure_airport: departure_airport || "",
       destination_airport: destination_airport || ""
@@ -181,7 +183,7 @@ async function sendEmail(email, departure_airport, destination_airport) {
 }
 
 async function getRentals(destination_airport) {
-  Places.apiKey = "AIzaSyC6b9DQp_K4IPwAg_r68yp85LJeXQ06V0I"
+  Places.apiKey = PLACES_API_KEY
 
   const airport = await Places.textsearch({
     query: `${destination_airport} airport`

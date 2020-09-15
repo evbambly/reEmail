@@ -22,7 +22,17 @@ function App() {
 
         }
       </header>
-      <div style={{ position: "absolute", bottom: "100px", right: "25%", color: "#64dcfc" }}>
+      <div style={{ position: "absolute", bottom: "50px", left: "25%", color: "#64dcfc" }}>
+        <a href="https://github.com/evbambly/reEmail" title="The Git repository">
+          <img
+            src={window.location.origin + "/Git.jpg"}
+            alt="ReEmail Logo"
+            style={{ height: "3rem" }}
+          />
+
+        </a>
+      </div>
+      <div style={{ position: "absolute", bottom: "50px", right: "25%", color: "#64dcfc" }}>
         Powered by &nbsp;
         <a href="https://retravel.io/">
           <img
