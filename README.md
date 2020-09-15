@@ -6,4 +6,7 @@ The email contains images which are very recommended, just download the email an
 
 All of the pictures are from public urls from google images.
 
+Best experience on web. 
+Also, we might be hiding in the Spam
+
 Tech Stack: React Firebase - Functions, Firestore, Hosting SendGrid - email provider Google Places API
