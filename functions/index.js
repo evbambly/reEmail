@@ -14,7 +14,6 @@ sgMail.setApiKey(SG_API_KEY);
 
 exports.emailMessage = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-
     const { email, departure_airport, destination_airport } = req.body;
     const error = await sendEmail(email, departure_airport, destination_airport);
     return error ? res.status(500).send(error) : res.sendStatus(200)
