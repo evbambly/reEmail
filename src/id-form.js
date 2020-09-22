@@ -88,7 +88,7 @@ function IDForm({ setEmailAddress }) {
                 <ValidatorForm
                     onSubmit={sendEmail}
                     onError={errors => console.log(errors)}
-                    style={{ display: "inline-block", backgroundColor: "#fc6d64", padding: "30px", marginBottom: "2%", marginTop: "10%" }}
+                    style={{ display: "inline-block", backgroundColor: "#fc6d64", padding: "30px", marginBottom: "2%", marginTop: "5%" }}
                 >
                     <TextValidator
                         select

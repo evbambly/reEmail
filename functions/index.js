@@ -16,6 +16,9 @@ exports.emailMessage = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     const { email, departure_airport, destination_airport } = req.body;
     const error = await sendEmail(email, departure_airport, destination_airport);
+    if (error) {
+      functions.logger.error(error)
+    }
     return error ? res.status(500).send(error) : res.sendStatus(200)
   })
 });
@@ -152,14 +155,17 @@ async function dequeueResend(event) {
 async function sendEmail(email, departure_airport, destination_airport) {
 
   try {
-    const results = await getRentals(destination_airport)
-functions.logger.error(results)
-    carRental = results[0]
+    let carRental = {}
     let lat = ""
-    let lng =""
-    if (carRental.geometry && carRental.geometry.location) {
-      lat = carRental.geometry.location.lat
-      lng = carRental.geometry.location.lng
+    let lng = ""
+    const results = await getRentals(destination_airport)
+    if (results) {
+
+      carRental = results[0]
+      if (carRental.geometry && carRental.geometry.location) {
+        lat = carRental.geometry.location.lat
+        lng = carRental.geometry.location.lng
+      }
     }
     const msg = {
       to: email,
@@ -172,8 +178,9 @@ functions.logger.error(results)
         vicinity: carRental.vicinity || "",
         rating: carRental.rating || "",
         open_now: carRental.opening_hours && carRental.opening_hours.open_now ? "They are open now" : "",
-        lat: lat,
-        lng: lng,
+        lat: lat || "",
+        lng: lng || "",
+        place_id: carRental.place_id || ""
       },
     };
     sgMail.send(msg);
@@ -191,18 +198,24 @@ functions.logger.error(results)
 
 async function getRentals(destination_airport) {
   Places.apiKey = PLACES_API_KEY
+  let response = undefined
+  try {
 
-  const airport = await Places.textsearch({
-    query: `${destination_airport} airport`
-  });
+    const airport = await Places.textsearch({
+      query: `${destination_airport} airport`
+    });
 
-  const location = airport.results[0].geometry.location;
+    const location = airport.results[0].geometry.location;
 
-  const response = await Places.nearbysearch({
-    location: `${location.lat},${location.lng}`, // LatLon delimited by ,
-    radius: "500",  // Radius cannot be used if rankBy set to DISTANCE
-    type: "car_rental", // Undefined type will return all types
-  });
+    response = await Places.nearbysearch({
+      location: `${location.lat},${location.lng}`, // LatLon delimited by ,
+      radius: "5000",  // Radius cannot be used if rankBy set to DISTANCE
+      type: "car_rental", // Undefined type will return all types
+    });
+  }
+  catch (err) {
+    functions.logger.error(err);
+  }
 
-  return response.results;
+  return response ? response.results : undefined;
 }

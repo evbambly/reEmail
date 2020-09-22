@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { TableContainer, Table, TableHead, Paper, TableRow, TableCell, TableBody, TablePagination, Button } from '@material-ui/core'
+import { TableContainer, Table, TableHead, Paper, TableRow, TableCell, TableBody, TablePagination, Button, CircularProgress } from '@material-ui/core'
 import * as firebase from "firebase/app";
 import "firebase/firestore";
 import TablePaginationActions from './table-pagination-actions'
@@ -9,7 +9,7 @@ export default function DataTable({ emailAddress, back }) {
     const ROWS_PER_PAGE = 4
     const [rows, setRows] = useState([])
     const [page, setPage] = useState(0)
-    const [refresh, setRefresh] = useState(new Date())
+    const [isRefreshing, setIsRefreshing] = useState(true)
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -18,9 +18,10 @@ export default function DataTable({ emailAddress, back }) {
         const fetchRows = async () => {
             const doc = await firebase.firestore().collection("recipients").doc(emailAddress).get()
             setRows(doc.data().status)
+            setIsRefreshing(false)
         }
         fetchRows()
-    }, [emailAddress, refresh])
+    }, [emailAddress, isRefreshing])
     const sortRows = (a, b) => {
         return a.timestamp < b.timestamp ? 1 : -1
     }
@@ -45,7 +46,7 @@ export default function DataTable({ emailAddress, back }) {
                                     </TableCell>
                                     <TableCell align="right">{row.event}</TableCell>
                                     <TableCell align="right">{row.sg_message_id}</TableCell>
-                                    <TableCell align="right" style={{whiteSpace: "nowrap"}}>{moment(row.timestamp * 1000).toLocaleString()}</TableCell>
+                                    <TableCell align="right" style={{ whiteSpace: "nowrap" }}>{moment(row.timestamp * 1000).toLocaleString()}</TableCell>
                                 </TableRow>
                             )) : null}
                         <TableRow>
@@ -61,9 +62,21 @@ export default function DataTable({ emailAddress, back }) {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <div style={{display:"inline-block"}}>
-            <Button variant="contained" color="primary" style={{ marginTop: "3%", marginLeft: "3%" }} onClick={() => setRefresh(new Date())}>Refresh</Button>
-            <Button variant="contained" color="primary" style={{ marginTop: "3%" }} onClick={back}>Back</Button>
+            <div style={{ display: "inline-block" }}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    style={{ marginTop: "3%", marginLeft: "3%" }}
+                    onClick={() => setIsRefreshing(true)}>
+                    {isRefreshing ?
+                        <CircularProgress color="secondary" size="1.5rem" /> :
+                        "Refresh"}
+                </Button>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    style={{ marginTop: "3%" }}
+                    onClick={back}>Back</Button>
             </div>
         </>
     )
