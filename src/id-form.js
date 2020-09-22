@@ -17,20 +17,20 @@ function IDForm({ setEmailAddress }) {
 
     const airports = [
         {
-            value: 'LLBG',
-            label: 'Ben Gurion, Tel Aviv',
+            value: 'Ben Gurion',
+            label: 'Tel Aviv (LLBG)',
         },
         {
-            value: 'CDG',
-            label: 'Charles de Gaulle, Paris',
+            value: 'Charles de Gaulle',
+            label: 'Paris (CDG)',
         },
         {
-            value: 'LHR',
-            label: 'Heathrow, London',
+            value: 'Heathrow',
+            label: 'London (LHR)',
         },
         {
-            value: 'FRA',
-            label: 'Frankfurt',
+            value: 'Frankfurt',
+            label: 'Frankfurt (FRA)',
         },
     ];
 

@@ -8,7 +8,7 @@ const cors = corsModule({ origin: true })
 const Places = require("google-places-web").default;
 
 const SG_API_KEY = functions.config().sendgrid.key;
-const SG_TEMPLATE_ID = functions.config().sendgrid.key;
+const SG_TEMPLATE_ID = functions.config().sendgrid.template;
 const PLACES_API_KEY = functions.config().places.key;
 sgMail.setApiKey(SG_API_KEY);
 
@@ -153,8 +153,14 @@ async function sendEmail(email, departure_airport, destination_airport) {
 
   try {
     const results = await getRentals(destination_airport)
-
+functions.logger.error(results)
     carRental = results[0]
+    let lat = ""
+    let lng =""
+    if (carRental.geometry && carRental.geometry.location) {
+      lat = carRental.geometry.location.lat
+      lng = carRental.geometry.location.lng
+    }
     const msg = {
       to: email,
       from: "evbambly@gmail.com",
@@ -165,16 +171,18 @@ async function sendEmail(email, departure_airport, destination_airport) {
         rental_name: carRental.name || "",
         vicinity: carRental.vicinity || "",
         rating: carRental.rating || "",
-        open_now: carRental.opening_hours && carRental.opening_hours.open_now ? "They are open now" : ""
+        open_now: carRental.opening_hours && carRental.opening_hours.open_now ? "They are open now" : "",
+        lat: lat,
+        lng: lng,
       },
     };
+    sgMail.send(msg);
     firebase.firestore().collection("sentMail").doc(email).set({
       departure_airport: departure_airport || "",
       destination_airport: destination_airport || ""
     }).catch(err => {
       functions.logger.error(err)
     })
-    sgMail.send(msg);
     return null
   } catch (err) {
     return err

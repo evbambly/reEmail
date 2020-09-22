@@ -32,9 +32,7 @@ export default function DataTable({ emailAddress, back }) {
                         <TableRow style={{ fontWeight: "bold", maxHeight: "3rem" }}>
                             <TableCell><strong>email</strong></TableCell>
                             <TableCell align="right"><strong>event</strong></TableCell>
-                            <TableCell align="right"><strong>reason</strong></TableCell>
                             <TableCell align="right"><strong>sg_message_id</strong></TableCell>
-                            <TableCell align="right"><strong>smtp-id</strong></TableCell>
                             <TableCell align="right"><strong>timestamp</strong></TableCell>
                         </TableRow>
                     </TableHead>
@@ -46,10 +44,8 @@ export default function DataTable({ emailAddress, back }) {
                                         {row.email}
                                     </TableCell>
                                     <TableCell align="right">{row.event}</TableCell>
-                                    <TableCell align="right">{row.reason}</TableCell>
                                     <TableCell align="right">{row.sg_message_id}</TableCell>
-                                    <TableCell align="right">{row["smtp-id"]}</TableCell>
-                                    <TableCell align="right">{moment(row.timestamp * 1000).toLocaleString()}</TableCell>
+                                    <TableCell align="right" style={{whiteSpace: "nowrap"}}>{moment(row.timestamp * 1000).toLocaleString()}</TableCell>
                                 </TableRow>
                             )) : null}
                         <TableRow>
